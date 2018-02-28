@@ -1,9 +1,9 @@
-# TIC2017
-Telstra Innovation Challenge 2017
+# TIC2018
+Telstra Innovation Challenge 2018
 
 This repository will contain all the information required to succeed in the Telstra Innovation Challenge.
 
-Make sure to check out the [Wiki page](https://github.com/telstra/TIC2017/wiki) to access the Getting Started guide!
+Make sure to check out the [Wiki page](https://github.com/telstra/TIC2018/wiki) to access the Getting Started guide!
 
 We'll also be updating the [Tips and Tricks](https://github.com/telstra/TIC2017/wiki/3.-Tips-and-Tricks) page regularly, so check it out if you want some sweet, sweet knowledge.
 
