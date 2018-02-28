@@ -1,0 +1,50 @@
+##Messaging API Introduction
+
+The Messaging API sends SMS messages to mobile devices in a single request. You can also query the status of a previously sent SMS message.
+
+The __first__ step to use the Telstra Messaging API is to create a developer account and apply for a new API key by __registering your application on the portal__ [sdev.telstra.com](https://sdev.telstra.com) with the event code _innovation_. This initial alpha release only allows the sending of SMS messages with a fixed outgoing callerID of  "TelstraAPI".
+
+There is a limit of 1000 free SMS messages per month and 100 per day. If you would like more volume then contact us at t.dev@team.telstra.com
+
+Alpha keys will be available Mon/Tues 
+
+##Alpha release features
+
+For this alpha release we’ve included the following features;
+
+_International sending_: Send SMS messages to anyone in Australia or anywhere in world, from Australian numbers
+
+_Long messages_: Up to 500 characters per SMS, concatenated
+
+_UTF-8_: Accepts all Unicode characters as part of UTF-8
+
+_Delivery status_: Query the delivery status of your SMS messages
+
+_Bounce-back response_:  See if your SMS hit an unreachable unallocated Australian national number (Australia-only)
+
+##Getting access to the API
+
+To get access to this API go to the MyApps page and register your application with the "add new app" button.  There is a maximum of 1 free SMS application per developer. Additional applications can be purchased from the pricing page. 
+
+##Frequently Asked Questions
+
+Q: Why only send SMS messages from a fixed CallerID?
+
+A: This is the initial alpha introduction of this API and is mainly to test the release procedure and provide a basic functionality to get started. We have an extensive roadmap for this API including, allocating addresses for receiving messages, ability to send MMS and RCS and other features.
+
+Q: Will I be able to upgrade to future versions seamlessly?
+
+A: Yes, the plan is to take our customers along on the development journey, new features will be seamlessly integrated into the API so they become available with no migrations needed.
+
+Q: How do I get support??
+
+A: We have Telstra dedicated engineers on point to answer your questions: 
+Join our Community Slack channel via: [Community Slack](https://join.slack.com/t-dev-community/shared_invite/MTgwNDQ4NDY3OTc0LTE0OTQwMzAyMzEtYTY2MjkzMmZlMA)
+
+
+
+
+##Terms and Conditions
+Use of the Telstra Messaging API is bound by these Terms and Conditions. By agreeing to the overall T.Dev Terms and Conditions when you sign up an account, you agree to all API specific Terms and Conditions.
+
+

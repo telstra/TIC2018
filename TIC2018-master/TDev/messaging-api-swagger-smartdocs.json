@@ -1,0 +1,373 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "SMS API",
+        "description": "This is the SMS API that provides the ability to send SMS.",
+        "version": "1.0.0",
+        "termsOfService": "http://helloreverb.com/terms/",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "host": "api.telstra.com",
+    "basePath": "/v1/sms",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/messages": {
+            "post": {
+                "operationId": "Send SMS",
+                "summary": "Send SMS",
+                "description": "Sends a SMS to a single Australia mobile phone number. A unique identifier (messageId) returned in the response, which may be used to query for the delivery status of the message.\n",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "A header in the format 'Bearer {access_token}' - get the token by using the OAuth API with the scope 'SMS'",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "payload",
+                        "in": "body",
+                        "description": "A JSON payload containing the recipient's Australian phone number and text message.\n\nThe recipient number should be in the format '04xxxxxxxx' where x is a digit",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SendSMS"
+                        }
+                    }
+                ],
+                "tags": [
+                    "SMS"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Success - the unique identifier for the message sent is returned",
+                        "schema": {
+                            "$ref": "#/definitions/SendSMSResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing request parameters",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Invalid or no credentials passed in the request",
+                        "schema": {}
+                    },
+                    "403": {
+                        "description": "Authorization credentials passed and accepted but account does not have permission",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "The requested URI does not exist",
+                        "schema": {}
+                    },
+                    "405": {
+                        "description": "The requested resource does not support the supplied verb",
+                        "schema": {}
+                    },
+                    "415": {
+                        "description": "API does not support the requested content type",
+                        "schema": {}
+                    },
+                    "422": {
+                        "description": "The request is formed correctly, but due to some condition the request cannot be processed e.g. email is required and it is not provided in the request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "An internal error occurred when processing the request",
+                        "schema": {}
+                    },
+                    "501": {
+                        "description": "The HTTP method being used has not yet been implemented for the requested resource",
+                        "schema": {}
+                    },
+                    "503": {
+                        "description": "The service requested is currently unavailable",
+                        "schema": {}
+                    }
+
+                },
+                "security": []
+            }
+        },
+        "/messages/{messageId}": {
+            "get": {
+                "operationId": "Get Message Status",
+                "summary": "Get the status of a SMS message",
+                "description": "Use the unique identifier (messageId) returned as returned in the response from the Send SMS method to get the status.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization header in the format 'Bearer {access_token}' - get the token by using the OAuth API with the scope 'SMS'",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "description": "Unique identifier of a message - it is the value returned from a previous POST https://api.telstra.com/v1/sms/messages call",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "SMS"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Success - the message status is returned",
+                        "schema": {
+                            "$ref": "#/definitions/MessageStatus"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing request parameters",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Invalid or no credentials passed in the request",
+                        "schema": {}
+                    },
+                    "403": {
+                        "description": "Authorization credentials passed and accepted but account does not have permission",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "The requested URI does not exist",
+                        "schema": {}
+                    },
+                    "405": {
+                        "description": "The requested resource does not support the supplied verb",
+                        "schema": {}
+                    },
+                    "415": {
+                        "description": "API does not support the requested content type",
+                        "schema": {}
+                    },
+                    "422": {
+                        "description": "The request is formed correctly, but due to some condition the request cannot be processed e.g. email is required and it is not provided in the request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "An internal error occurred when processing the request",
+                        "schema": {}
+                    },
+                    "501": {
+                        "description": "The HTTP method being used has not yet been implemented for the requested resource",
+                        "schema": {}
+                    },
+                    "503": {
+                        "description": "The service requested is currently unavailable",
+                        "schema": {}
+                    }
+                },
+                "security": []
+            }
+        },
+        "/messages/{messageId}/response": {
+            "get": {
+                "operationId": "Get Message Response",
+                "summary": "Get the responses of a SMS message",
+                "description": "The recipients of your SMS messages can send a reply which you can retrieve using the Get Message Response method. Pass through the unique identifier (messageId) returned as returned in the response from the Send SMS method and you will receive the reply and the timestamp.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization header in the format 'Bearer {access_token}' - get the token by using the OAuth API with the scope 'SMS'",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "description": "Unique identifier of a message - it is the value returned from a previous POST https://api.telstra.com/v1/sms/messages call",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "SMS"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - A list of responses are returned",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/MessageResponses"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing request parameters",
+                        "schema": {}
+                    },
+                    "401": {
+                        "description": "Invalid or no credentials passed in the request",
+                        "schema": {}
+                    },
+                    "403": {
+                        "description": "Authorization credentials passed and accepted but account does not have permission",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "The requested URI does not exist",
+                        "schema": {}
+                    },
+                    "405": {
+                        "description": "The requested resource does not support the supplied verb",
+                        "schema": {}
+                    },
+                    "415": {
+                        "description": "API does not support the requested content type",
+                        "schema": {}
+                    },
+                    "422": {
+                        "description": "The request is formed correctly, but due to some condition the request cannot be processed e.g. email is required and it is not provided in the request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "An internal error occurred when processing the request",
+                        "schema": {}
+                    },
+                    "501": {
+                        "description": "The HTTP method being used has not yet been implemented for the requested resource",
+                        "schema": {}
+                    },
+                    "503": {
+                        "description": "The service requested is currently unavailable",
+                        "schema": {}
+                    }
+                },
+                "security": []
+            }
+        }
+    },
+    "securityDefinitions": {
+	    "OAuth2": {
+		    "type": "oath2",
+		    "tokenUrl": "/v1/oauth/token",
+		    "flow": "application",
+		    "scopes": {
+			    "SMS": "OAuth scope for SMS API"
+		    }
+	    }
+    },
+    "definitions": {
+        "SendSMS": {
+            "type": "object",
+            "properties": {
+                "to": {
+                    "type": "string",
+                    "description": "Phone number to send sms to"
+                },
+                "body": {
+                    "type": "string",
+                    "description": "Text body message"
+                }
+            }
+        },
+        "SendSMSResponse": {
+            "type": "object",
+            "properties": {
+                "messageId": {
+                    "type": "string",
+                    "description": "Message ID of the SMS you sent. Use this ID to view the message \nstatus or get responses.\n"
+                }
+            },
+            "example": {
+                "messageId": "CBCB3DCC991D8AF0"
+            }
+        },
+        "MessageStatus": {
+            "type": "object",
+            "properties": {
+                "to": {
+                    "type": "string",
+                    "description": "The phone number (recipient) the message was sent to."
+                },
+                "receivedTimestamp": {
+                    "type": "string",
+                    "description": "The date and time when the message was recieved by recipient."
+                },
+                "sentTimestamp": {
+                    "type": "string",
+                    "description": "The date and time when the message was sent."
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Delivery status of the message",
+                    "enum": [
+                        "PEND",
+                        "SENT",
+                        "DELIVRD",
+                        "READ"
+                    ]
+                }
+            },
+            "example": {
+                "to": "04XXXXXXXX",
+                "receivedTimestamp": "2015-02-05T14:10:14+11:00",
+                "sentTimestamp": "2015-02-05T14:10:12+11:00",
+                "status": "DELIVRD"
+            }
+        },
+        "MessageResponses": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string",
+                    "description": "Phone number the response was sent from."
+                },
+                "acknowledgedTimestamp": {
+                    "type": "string",
+                    "description": "The date and time when the response was acknowledged."
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The response content."
+                }
+            },
+            "example": {
+                "from": "04XXXXXXXX",
+                "acknowledgedTimestamp": "2015-06-22T09:22:00+10:00",
+                "content": "Hello, Telstra"
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "The status code."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Message describing the error."
+                }
+            },
+            "example": {
+                "status": 400,
+                "message": "Invalid or missing request parameters"
+            }
+        }
+    }
+}
