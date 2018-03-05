@@ -1,7 +1,7 @@
 {
 	"variables": [],
 	"info": {
-		"name": "TIC2017 Telstra IoT Platform (Cumulocity) API",
+		"name": "TIC2018 Telstra IoT Platform (Cumulocity) API",
 		"_postman_id": "35fc31c9-3a74-6d1b-c5a7-2710baad23a7",
 		"description": "Collection for the Internet of Things service Cumulocity\n\nEnvironment variables used in this Postman Collection:\n\nurl = the IP adress/domain of your cumulocity server\n\nauth = \"Basic [credentials]\", where [credentials] is the base64-encoded tenant/username:password or username:password",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
