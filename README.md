@@ -7,3 +7,5 @@ This includes:
  - Function Libraries
  - Hopes and Dreams
  - Example Scripts
+
+Head on over to the wiki (https://github.com/telstra/TIC2018/wiki) to get started, or jump right in with the zip file above
