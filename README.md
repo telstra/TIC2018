@@ -2,8 +2,8 @@
 Repository for TIC2018
 
 This includes:
- - Information about what is contained in the TIC2018 development kits (See the Wiki)
- - Instructions for powering and connecting up the Cat-M1 Innovation Shield
+ - Information about what is contained in the TIC2018 development kits (See the Wiki on this page)
+ - Instructions for powering and connecting up the Cat-M1 Development Board
  - Function Libraries
  - Hopes and Dreams
  - Example Scripts
