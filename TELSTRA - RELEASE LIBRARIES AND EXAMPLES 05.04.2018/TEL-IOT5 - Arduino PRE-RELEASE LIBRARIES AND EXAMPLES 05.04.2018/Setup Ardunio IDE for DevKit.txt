@@ -1,0 +1,3 @@
+Follow:
+https://learn.adafruit.com/adafruit-metro-m0-express-designed-for-circuitpython/arduino-ide-setup
+https://learn.adafruit.com/adafruit-metro-m0-express-designed-for-circuitpython/using-with-arduino-ide
