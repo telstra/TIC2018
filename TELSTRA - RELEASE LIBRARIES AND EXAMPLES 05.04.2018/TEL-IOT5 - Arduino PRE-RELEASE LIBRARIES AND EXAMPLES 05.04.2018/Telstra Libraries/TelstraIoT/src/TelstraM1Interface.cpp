@@ -54,15 +54,15 @@ void TelstraM1Interface::begin()
 	
 	pinMode(g55_resetPin, OUTPUT);
 	digitalWrite(g55_resetPin, LOW); 
-	delay(1);
+	delay(10);
 	digitalWrite(g55_resetPin, HIGH); 
 	delay(1000);
 
-	this->_spi->begin();
-
 	pinMode(chipSelectPin, OUTPUT);
 	digitalWrite(chipSelectPin, HIGH);
-	pinMode(dataReadyPin, INPUT);	
+	pinMode(dataReadyPin, INPUT);
+
+	this->_spi->begin();	
 }
 
 void TelstraM1Interface::resetCellularSystem()
@@ -71,6 +71,7 @@ void TelstraM1Interface::resetCellularSystem()
 	delay(1);
 	digitalWrite(g55_resetPin, HIGH); 
 	delay(500);
+	reportln(REPORT_L3,"[LOG] resetCellularSystem()[3] : Complete");
 }
 
 void TelstraM1Interface::end()
@@ -110,10 +111,12 @@ int TelstraM1Interface::getResponse(char buffer[], int length, int timeout)
  */
 int TelstraM1Interface::sendCommand(char buffer[], int length)
 {
+	reportln(REPORT_L3, "<SPI Interface:sendCommand> - Entering function");
 	if(this->dataReadyPin == HIGH) {
 		reportln(REPORT_L2, "<SPI Interface:sendCommand> - Cannot send comamand (BUSY)");
 		return BUSY;
 	} else {
+		reportln(REPORT_L3, "<SPI Interface:sendCommand> - Ready to send");
 		return spiWrite(buffer,length);
 	}
 }
@@ -123,14 +126,14 @@ int TelstraM1Interface::sendCommand(char buffer[], int length)
  */
 int TelstraM1Interface::waitResponse(int timeout)
 {
-	initTimedOut((unsigned long)timeout);
-	while(!processTimedOut())
-	{
+	unsigned long startTime =millis();
+	while( millis() - startTime < (unsigned long) timeout){
 		if(digitalRead(dataReadyPin) == HIGH)
 		{
 			return TELSTRAIOT_STATUS_OK;
 		}
 	}
+	reportln(REPORT_L2, "<SPI Interface:waitResponse> - Timeout");	
 	return TELSTRAIOT_STATUS_TIMEOUT;
 }
 
@@ -167,7 +170,6 @@ int TelstraM1Interface::spiRead(char buf[], uint16_t len)
 		if (processTimedOut()) { //This means that G55 is not responding
 			reportln(REPORT_L2, "<SPI Interface:spiRead> - SPI Read timeout - Resetting...");
 			this->_spi->endTransaction();
-			resetCellularSystem();
 			return TELSTRAIOT_STATUS_TIMEOUT;
 		}
 	}
@@ -196,6 +198,7 @@ int TelstraM1Interface::spiWrite(char buf[], uint16_t len)
 
       if (processTimedOut()) {
       	reportln(REPORT_L2, "<SPI Interface:spiWrite> - SPI Write timeout");
+		digitalWrite(chipSelectPin, HIGH);
       	this->_spi->endTransaction();
       	return TELSTRAIOT_STATUS_TIMEOUT;
       }

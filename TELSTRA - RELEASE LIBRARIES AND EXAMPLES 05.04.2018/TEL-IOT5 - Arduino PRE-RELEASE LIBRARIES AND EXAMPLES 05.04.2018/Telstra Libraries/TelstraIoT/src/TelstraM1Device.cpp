@@ -30,13 +30,13 @@ int TelstraM1Device::getStatus(char* resultBuffer, int length)
 
 	//result < 0 means an error code
 	if (result < 0) {
-		reportln(REPORT_L2, "<M1Device:getStatus> - Response Timeout");
+		reportln(REPORT_L3, "<M1Device:getStatus> - Response Timeout");
 		return TELSTRAIOT_STATUS_ERROR;	
 	}
 
 	//Checking correct packet header
 	if (packet_get_command(resultBuffer) != CMD_RES_OFFSET + CMD_GET_STATUS) {
-		reportln(REPORT_L2, "<M1Device:getStatus> - Unknown response, resetting...");
+		reportln(REPORT_L3, "<M1Device:getStatus> - Unknown response, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_ERROR;	
 	}
@@ -53,7 +53,7 @@ int TelstraM1Device::getIMEI(char* resultBuffer)
 
 		return TELSTRAIOT_STATUS_OK;
 	} else {
-		reportln(REPORT_L2, "<M1Device:getIMEI> - Status timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getIMEI> - Status timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_ERROR;
 	}
@@ -158,11 +158,11 @@ int TelstraM1Device::waitUntilCellularSystemIsReady(int timeout)
 {
 	int attempts = 0;
 	while(!isPDPContextActive()) {
-		delay(500);
+		delay(1000);
 		attempts++;
 
 		if (attempts > (timeout*2)) {
-			reportln(REPORT_L2, "<M1Device:waitUntilCellularSystemIsReady> - Response Timeout");
+			reportln(REPORT_L3, "<M1Device:waitUntilCellularSystemIsReady> - Response Timeout");
 			return 	TELSTRAIOT_STATUS_TIMEOUT;
 		} 
 	}
@@ -187,12 +187,12 @@ int TelstraM1Device::writeCredentials(const char *deviceID,const char *deviceTen
 		if (packet_get_command(sharedBuffer) == CMD_RES_OFFSET + CMD_WRITE_CRED)
 			return TELSTRAIOT_STATUS_OK;	
 		else {
-			reportln(REPORT_L2, "<M1Device:writeCredentials> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:writeCredentials> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:writeCredentials> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:writeCredentials> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;
 	}
@@ -218,12 +218,12 @@ int TelstraM1Device::readCredentials(char *deviceID,char *deviceTenant,char *dev
 			packet_get_param(devicePassword,sharedBuffer,3);
 			return TELSTRAIOT_STATUS_OK;	
 		} else {
-			reportln(REPORT_L2, "<M1Device:readCredentials> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:readCredentials> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:readCredentials> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:readCredentials> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -243,12 +243,12 @@ int TelstraM1Device::clearCredentials()
 		if (packet_get_command(sharedBuffer) == CMD_RES_OFFSET + CMD_CLEAR_CRED){
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:clearCredentials> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:clearCredentials> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:clearCredentials> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:clearCredentials> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -268,12 +268,12 @@ int TelstraM1Device::resetModem()
 		if (packet_get_command(sharedBuffer) == CMD_RES_OFFSET + CMD_RESET_MODEM){
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:resetModem> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:resetModem> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:resetModem> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:resetModem> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -294,12 +294,12 @@ int TelstraM1Device::getBatteryStatus()
 		if (packet_get_command(sharedBuffer) == CMD_RES_OFFSET + CMD_GET_BATTERY_STATUS) {
 			return (int)packet_get_numeric_param(sharedBuffer,0);
 		} else {
-			reportln(REPORT_L2, "<M1Device:getBatteryStatus> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:getBatteryStatus> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:getBatteryStatus> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getBatteryStatus> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -320,12 +320,12 @@ int TelstraM1Device::getBatteryStateOfCharge()
 		if (packet_get_command(sharedBuffer) == CMD_RES_OFFSET + CMD_GET_BATTERY_SOC) {
 			return (int)packet_get_numeric_param(sharedBuffer,0);
 		} else {
-			reportln(REPORT_L2, "<M1Device:getBatteryStateOfCharge> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:getBatteryStateOfCharge> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:getBatteryStateOfCharge> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getBatteryStateOfCharge> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -347,12 +347,12 @@ int TelstraM1Device::getTemperature(char *temperature)
 			packet_get_param(temperature,sharedBuffer,0);
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:getTemperature> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:getTemperature> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:getTemperature> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getTemperature> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -374,12 +374,12 @@ int TelstraM1Device::getLightLevel(char *lightLevel)
 			packet_get_param(lightLevel,sharedBuffer,0);
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:getLightLevel> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:getLightLevel> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:getLightLevel> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getLightLevel> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -400,12 +400,12 @@ int TelstraM1Device::getLightSensorState(char* resultBuffer, int len)
 		if (packet_get_command(resultBuffer) == CMD_RES_OFFSET + CMD_GET_LIGHT_SENSOR_STATE) {
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:getLightSensorState> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:getLightSensorState> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:getLightSensorState> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getLightSensorState> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -441,12 +441,12 @@ int TelstraM1Device::getLightSensorParams(char* resultBuffer, int len)
 		if (packet_get_command(resultBuffer) == CMD_RES_OFFSET + CMD_GET_LIGHT_SENSOR_PARAMS) {
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:getLightSensorParams> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:getLightSensorParams> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:getLightSensorParams> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:getLightSensorParams> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}
@@ -495,12 +495,12 @@ int TelstraM1Device::setLightSensorParams(uint8_t gain, uint8_t int_rate, uint8_
 		if (packet_get_command(sharedBuffer) == CMD_RES_OFFSET + CMD_SET_LIGHT_SENSOR_PARAMS) {
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:setLightSensorParams> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:setLightSensorParams> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:setLightSensorParams> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:setLightSensorParams> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}	
@@ -522,12 +522,12 @@ int TelstraM1Device::updateRTCFromNetwork(char* resultBuffer)
 			packet_get_param(resultBuffer,sharedBuffer,0);
 			return TELSTRAIOT_STATUS_OK;
 		} else {
-			reportln(REPORT_L2, "<M1Device:updateRTCFromNetwork> - Unknown response, resetting...");
+			reportln(REPORT_L3, "<M1Device:updateRTCFromNetwork> - Unknown response, resetting...");
 			commsif->resetCellularSystem();
 			return TELSTRAIOT_STATUS_ERROR;
 		}
 	} else {
-		reportln(REPORT_L2, "<M1Device:updateRTCFromNetwork> - Timeout, resetting...");
+		reportln(REPORT_L3, "<M1Device:updateRTCFromNetwork> - Timeout, resetting...");
 		commsif->resetCellularSystem();
 		return TELSTRAIOT_STATUS_TIMEOUT;	
 	}	
