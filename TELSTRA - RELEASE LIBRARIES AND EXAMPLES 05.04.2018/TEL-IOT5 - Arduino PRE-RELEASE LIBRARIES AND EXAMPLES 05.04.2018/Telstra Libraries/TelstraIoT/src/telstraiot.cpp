@@ -11,13 +11,13 @@ HttpResponse::HttpResponse(Connection4G* conn, char* jsonElement, int elementBuf
 	}
 	responsePtr = 0;
 
-    reportln(REPORT_L2,"[LOG] Performing TCP Read");
+    reportln(REPORT_L3,"[LOG] Performing TCP Read");
 	responseLength = conn->TCPRead(responseContent,HTTP_RESPONSE_LENGTH);
 
 	if(responseLength>0)
 	{
-        reportln(REPORT_L2,"[LOG] Response received!");
-        reportln(REPORT_L2,responseLength);
+        reportln(REPORT_L3,"[LOG] Response received!");
+        reportln(REPORT_L3,responseLength);
 
 		readHeader(NULL);
 
@@ -29,7 +29,7 @@ HttpResponse::HttpResponse(Connection4G* conn, char* jsonElement, int elementBuf
 			jsonElement[0] = '\0';
 		}
 	} else {
-        reportln(REPORT_L2,"[Warning] Exiting HTTPresponse : Timeout - no response received");
+        reportln(REPORT_L3,"[Warning] Exiting HTTPresponse : Timeout - no response received");
 	}
 
 }
@@ -44,15 +44,15 @@ HttpResponse::HttpResponse(Connection4G* conn, const char* jsonPath, char* buffe
 	}
 	responsePtr = 0;
 
-    reportln(REPORT_L2,"[LOG] Performing TCP Read");
+    reportln(REPORT_L3,"[LOG] Performing TCP Read");
 	
     responseLength = conn->TCPRead(responseContent,HTTP_RESPONSE_LENGTH);
 
 	if(responseLength>0)
 	{
-        reportln(REPORT_L2,"Response received!");
-        reportln(REPORT_L2,responseLength);
-		reportln(REPORT_L2,"Response content: ");
+        reportln(REPORT_L3,"Response received!");
+        reportln(REPORT_L3,responseLength);
+		reportln(REPORT_L3,"Response content: ");
 
 		readHeader(httpDateBuffer);
 
@@ -64,7 +64,7 @@ HttpResponse::HttpResponse(Connection4G* conn, const char* jsonPath, char* buffe
 			}
 		}
 	} else {
-		reportln(REPORT_L2,"[Warning] Exiting HTTPresponse : Timeout - no response received");
+		reportln(REPORT_L3,"[Warning] Exiting HTTPresponse : Timeout - no response received");
 	}
 }
 
@@ -85,7 +85,7 @@ bool HttpResponse::findJsonElementContaining(const char* substring, char* buffer
     if (!readToElementStart(c, prevTime)) {
         return false;
     }
-    reportln(REPORT_L3,"[LOG] Entering findJsonElementContaining()");
+    reportln(REPORT_L4,"[LOG] Entering findJsonElementContaining()");
     while (true) {
         c = readByte();
         if (c > 0) {
@@ -106,7 +106,7 @@ bool HttpResponse::findJsonElementContaining(const char* substring, char* buffer
                     } else {
                         buffer[bufferLength - 1] = '\0';
                     }
-                    reportln(REPORT_L3,"[LOG] Exiting findJsonElementContaining() : Found JSON element");
+                    reportln(REPORT_L4,"[LOG] Exiting findJsonElementContaining() : Found JSON element");
                     return true;
                 } else if(readToElementStart(c, prevTime)) {
                     // start next element
@@ -116,7 +116,7 @@ bool HttpResponse::findJsonElementContaining(const char* substring, char* buffer
                 } else {
                     // end of response, or response not received
                     buffer[0] = '\0';
-                    reportln(REPORT_L3,"[WARNING] Exiting findJsonElementContaining() : end of response, or response not received");
+                    reportln(REPORT_L4,"[WARNING] Exiting findJsonElementContaining() : end of response, or response not received");
                     return false;
                 }
 
@@ -133,7 +133,7 @@ bool HttpResponse::findJsonElementContaining(const char* substring, char* buffer
 }
 
 bool HttpResponse::readToElementStart(char &c, unsigned long &prevTime) {
-    reportln(REPORT_L3,"[LOG] Reading to element start");
+    reportln(REPORT_L4,"[LOG] Reading to element start");
     do {
         tryagain:
         c = readByte();
@@ -142,7 +142,7 @@ bool HttpResponse::readToElementStart(char &c, unsigned long &prevTime) {
             prevTime = millis();
         } else {
             if((millis() - prevTime) >= 2000) {
-                reportln(REPORT_L3,"[WARNING] Exiting readToElementStart()[1]: Timeout");
+                reportln(REPORT_L4,"[WARNING] Exiting readToElementStart()[1]: Timeout");
                 return false;
             }
         }
@@ -160,7 +160,7 @@ bool HttpResponse::readToElementStart(char &c, unsigned long &prevTime) {
             return true;
         } else {
             if((millis() - prevTime) >= 2000) {
-                reportln(REPORT_L3,"[WARNING] Exiting readToElementStart()[2]: Timeout");
+                reportln(REPORT_L4,"[WARNING] Exiting readToElementStart()[2]: Timeout");
                 return false;
             }
         }
@@ -183,7 +183,7 @@ void HttpResponse::readHttpCode() {
     char buff[20];
     buff[19] = '\0';
     // read HTTP code
-    reportln(REPORT_L2,"[LOG] Reading HTTP code...");
+    reportln(REPORT_L3,"[LOG] Reading HTTP code...");
     char c;
     int i=0;
     do {
@@ -199,8 +199,8 @@ void HttpResponse::readHttpCode() {
     char* code = strstr(buff, " ");
     code++;
     httpCode = atoi(code);
-    report(REPORT_L2,"[LOG] HTTP code: ");
-    reportln(REPORT_L2,httpCode);
+    report(REPORT_L3,"[LOG] HTTP code: ");
+    reportln(REPORT_L3,httpCode);
 }
 
 int HttpResponse::readDate(char* httpDate) {
@@ -210,7 +210,7 @@ int HttpResponse::readDate(char* httpDate) {
     char prev;
     unsigned long prevTime = millis();
     int exitcode = 0;
-    reportln(REPORT_L3,"[LOG] readDate(): checking valid date field");
+    reportln(REPORT_L4,"[LOG] readDate(): checking valid date field");
     while(i < 5) {
         c = readByte();
         if(prev == '\r\n' && c == prev) {
@@ -226,8 +226,8 @@ int HttpResponse::readDate(char* httpDate) {
             }
         } else {
             if((millis() - prevTime) >= 2000) {
-                report(REPORT_L3,"[WARNING] Exiting readDate()[1]: Timeout with exitcode =");
-                reportln(REPORT_L3,exitcode);
+                report(REPORT_L4,"[WARNING] Exiting readDate()[1]: Timeout with exitcode =");
+                reportln(REPORT_L4,exitcode);
                 exitcode = -3; // timeout
             }
         }
@@ -246,7 +246,7 @@ int HttpResponse::readDate(char* httpDate) {
         // header: 12 Feb 2013 08:01:26 GMT
         // target: 2013-02-12T08:01:26.000Z
         i = 0; // reusing
-        reportln(REPORT_L2,"[LOG] readDate(): reading date ");
+        reportln(REPORT_L3,"[LOG] readDate(): reading date ");
         while(c != '\r\n') {
             c = readByte();
             if(c > 0) {
@@ -330,7 +330,7 @@ int HttpResponse::readDate(char* httpDate) {
                 i++;
             } else {
                 if((millis() - prevTime) >= 2000) {
-                    reportln(REPORT_L2,"[WARNING] Exiting readDate()[2]: Timeout");
+                    reportln(REPORT_L3,"[WARNING] Exiting readDate()[2]: Timeout");
                     return -3; // timeout
                 }
             }
@@ -345,8 +345,8 @@ int HttpResponse::readDate(char* httpDate) {
 
         return 1;
     } else {    
-        report(REPORT_L3,"[WARNING] Exiting readDate(): Date Header not found with exitcode =");
-        reportln(REPORT_L3,exitcode);
+        report(REPORT_L4,"[WARNING] Exiting readDate(): Date Header not found with exitcode =");
+        reportln(REPORT_L4,exitcode);
         return exitcode;
     }
 }
@@ -431,7 +431,7 @@ void HttpResponse::readJSONValue(char* buffer, const int bufferLength) {
     int i = json ? 1 : 0;
     int jsonDepth = 1;
     char c;
-    reportln(REPORT_L3,"[LOG] readJSONValue(): reading response value");
+    reportln(REPORT_L4,"[LOG] readJSONValue(): reading response value");
     while (i < bufferLength) { // max i on exit = bufferLength
         c = readByte();
         if (c > 0) {
@@ -452,7 +452,7 @@ void HttpResponse::readJSONValue(char* buffer, const int bufferLength) {
         }
     }
     if ( i == bufferLength) {
-        reportln(REPORT_L3,("[WARNING] readJSONValue(): OVERFLOW"));
+        reportln(REPORT_L4,("[WARNING] readJSONValue(): OVERFLOW"));
         buffer[0] = '\0';
     } else {
         buffer[i++] = '\0'; // max i after instruction = bufferLength
@@ -461,7 +461,7 @@ void HttpResponse::readJSONValue(char* buffer, const int bufferLength) {
 //Warning: JSON Object not sanity check, expects data integrity
 bool HttpResponse::isJSONObject(char* buffer) {
     char c;
-    reportln(REPORT_L3,("[LOG] Enering isJSONObject()"));
+    reportln(REPORT_L4,("[LOG] Enering isJSONObject()"));
     while(true) {
         c = readByte();
 
@@ -475,10 +475,10 @@ bool HttpResponse::isJSONObject(char* buffer) {
 
         if (c == '{') {
             buffer[0] = c;
-            reportln(REPORT_L3,("[LOG] Exiting isJSONObject() : Object is JSON"));
+            reportln(REPORT_L4,("[LOG] Exiting isJSONObject() : Object is JSON"));
             return true; // JSON object
         } else if (c == '"') {
-            reportln(REPORT_L3,("[LOG] Exiting isJSONObject() : Object is STRING"));
+            reportln(REPORT_L4,("[LOG] Exiting isJSONObject() : Object is STRING"));
             return false; // string object
         }
     }
@@ -489,7 +489,7 @@ bool HttpResponse::locateJsonValue(const char* jsonPath) {
     int pieceBeginning=0;
     char c;
     unsigned long prevTime = millis();
-    reportln(REPORT_L3,("[LOG] Entering locateJsonValue()"));
+    reportln(REPORT_L4,("[LOG] Entering locateJsonValue()"));
     while(i < strlen(jsonPath)) {
         c = readByte();
         if (c > 0) {
@@ -506,7 +506,7 @@ bool HttpResponse::locateJsonValue(const char* jsonPath) {
                             prevTime = millis();
                         } else {
                             if((millis() - prevTime) >= 2000)
-                                reportln(REPORT_L3,("[WARNING] Exiting locateJsonValue()[1]: Timeout"));
+                                reportln(REPORT_L4,("[WARNING] Exiting locateJsonValue()[1]: Timeout"));
                                 goto timeout;
                         }
                     }
@@ -525,12 +525,12 @@ bool HttpResponse::locateJsonValue(const char* jsonPath) {
         } else {
             if((millis() - prevTime) >= 2000)
 			{
-                reportln(REPORT_L3,("[WARNING] Exiting locateJsonValue()[2]: Timeout"));
+                reportln(REPORT_L4,("[WARNING] Exiting locateJsonValue()[2]: Timeout"));
                 goto timeout;
 			}
         }
     }
-    reportln(REPORT_L3,("[LOG] Exiting locateJsonValue(): located JSON value"));
+    reportln(REPORT_L4,("[LOG] Exiting locateJsonValue(): located JSON value"));
     return i == strlen(jsonPath);
 timeout:
     return false;
@@ -589,8 +589,8 @@ HttpRequest::HttpRequest(Connection4G* conn)
 
 void HttpRequest::write(char* content)
 {
-    reportln(REPORT_L2,("[LOG] HttpRequest::write(): Writing http request :"));
-	reportln(REPORT_L2,content);
+    reportln(REPORT_L3,("[LOG] HttpRequest::write(): Writing http request :"));
+	reportln(REPORT_L3,content);
 	strcpy(requestContent+requestLength,content);
 	requestLength+=strlen(content);
 }
@@ -683,31 +683,31 @@ void HttpRequest::startContent(int contentLength) {
 }
 
 void HttpRequest::print() {
-    reportln(REPORT_L2,"=============================");
-    reportln(REPORT_L2,requestContent);
-    reportln(REPORT_L2,"=============================");
+    reportln(REPORT_L3,"=============================");
+    reportln(REPORT_L3,requestContent);
+    reportln(REPORT_L3,"=============================");
 }
 
 
 HttpResponse* HttpRequest::execute(char* jsonElement, int elementBufferLength, char* jsonValue, int valueBufferLength) {
     write("\r\n\r\n\0");
-    reportln(REPORT_L2,("[LOG] Entering HttpRequest::execute()[1]: executing request command"));
+    reportln(REPORT_L3,("[LOG] Entering HttpRequest::execute()[1]: executing request command"));
 	// wait for response
 	conn->TCPWrite(requestContent,requestLength);
 	delay(RESPONSE_REQUEST_DELAY);
 
-    reportln(REPORT_L2,("[LOG] Exiting HttpRequest::execute()[1]: requesting a response"));
+    reportln(REPORT_L3,("[LOG] Exiting HttpRequest::execute()[1]: requesting a response"));
     return new HttpResponse(conn, jsonElement, elementBufferLength, jsonValue, valueBufferLength);
 }
 
 HttpResponse* HttpRequest::execute(const char* jsonPath, char* buffer, int bufferLength, char* timeBuffer) {
     write("\r\n\r\n\0");
-    reportln(REPORT_L2,("[LOG] Entering HttpRequest::execute()[2]: executing request command"));
+    reportln(REPORT_L3,("[LOG] Entering HttpRequest::execute()[2]: executing request command"));
 	conn->TCPWrite(requestContent,requestLength);
 	delay(RESPONSE_REQUEST_DELAY);
 
  	// wait for response
-    reportln(REPORT_L2,("[LOG] Exiting HttpRequest::execute()[2]: requesting a response"));
+    reportln(REPORT_L3,("[LOG] Exiting HttpRequest::execute()[2]: requesting a response"));
     return new HttpResponse(conn, jsonPath, buffer, bufferLength, timeBuffer);
 }
 
@@ -808,7 +808,7 @@ HttpRequest* TelstraIoT::prepareRegistrationRequest(){
 
 int TelstraIoT::registerInPlatform(const char* type, const char* name, char* id, const int idLength, const char** supportedOperations, const int nSupportedOperations, const char** supportedMeasurements, const int nSupportedMeasurements) {
     
-    reportln(REPORT_L2,("[LOG] Entering registerInPlatform()"));
+    reportln(REPORT_L3,("[LOG] Entering registerInPlatform()"));
     HttpRequest* request = prepareRegistrationRequest();
 
     char* operationsFragment = prepareFragment(supportedOperations, nSupportedOperations);
@@ -845,18 +845,18 @@ int TelstraIoT::registerInPlatform(const char* type, const char* name, char* id,
     delete response;
     if(exitcode == 201) {
         exitcode = 1;
-		reportln(REPORT_L2,"[LOG] registerInPlatform():Success! Saving credentials to IoT Device");
+		reportln(REPORT_L3,"[LOG] registerInPlatform():Success! Saving credentials to IoT Device");
 		strcpy(deviceId,id);
 
 		writeCredentials(deviceId,tenantId,user,password);
-		reportln(REPORT_L2,"[LOG] registerInPlatform():Credentials saved.");
-		reportln(REPORT_L2,"[LOG] registerInPlatform():Note: saved credentials can be cleared using clearCredentials()");
+		reportln(REPORT_L3,"[LOG] registerInPlatform():Credentials saved.");
+		reportln(REPORT_L3,"[LOG] registerInPlatform():Note: saved credentials can be cleared using clearCredentials()");
 
     } else if (exitcode == 0) {
-		reportln(REPORT_L2,"[WARNING] registerInPlatform():No response received");
+		reportln(REPORT_L3,"[WARNING] registerInPlatform():No response received");
         exitcode = -2;
     } else {
-		reportln(REPORT_L2,"[WARNING] registerInPlatform():Invalid response received");
+		reportln(REPORT_L3,"[WARNING] registerInPlatform():Invalid response received");
         exitcode *= -1;
     }
     return exitcode;
@@ -896,17 +896,17 @@ int TelstraIoT::linkID(char* intId, char* extId) {
     int exitcode = response->getHttpCode();
 	delete response;
     if (exitcode == 0) {
-		reportln(REPORT_L2,"[WARNING] linkID():No response received");
+		reportln(REPORT_L3,"[WARNING] linkID():No response received");
         exitcode = -2;
     } else if(exitcode == 201) {
-		reportln(REPORT_L2,"[LOG] linkID():Valid response received");
+		reportln(REPORT_L3,"[LOG] linkID():Valid response received");
         exitcode = 1;
     } else if (exitcode > 0) {
- 		reportln(REPORT_L2,"[WARNING] linkID():Invalid response received, code : ");
- 		reportln(REPORT_L2,exitcode);
+ 		reportln(REPORT_L3,"[WARNING] linkID():Invalid response received, code : ");
+ 		reportln(REPORT_L3,exitcode);
        exitcode *= -1;
     }
-    reportln(REPORT_L2,"[LOG] Exiting linkID() ");
+    reportln(REPORT_L3,"[LOG] Exiting linkID() ");
     return exitcode;
 }
 
@@ -923,7 +923,7 @@ int TelstraIoT::registerDevice(const char* name, char* buffer, int bufferSize,
     int exitcode = registerInPlatform(TELSTRAIOT_ARDUINO_TYPE, name, buffer, bufferSize,
         supportedOperations, nSupportedOperations, supportedMeasurements, nSupportedMeasurements);
     if(exitcode > 0) {
-        reportln(REPORT_L2,buffer);
+        reportln(REPORT_L3,buffer);
         exitcode = 1;
     }
     return exitcode;
@@ -935,7 +935,7 @@ int TelstraIoT::registerDevice(const char* name, char* buffer, int bufferSize, c
 	const char** ops = NULL;
     int exitcode = registerInPlatform(TELSTRAIOT_ARDUINO_TYPE, name, buffer, bufferSize,ops, 0, supportedMeasurements, nSupportedMeasurements);
     if(exitcode > 0) {
-        reportln(REPORT_L2,buffer);
+        reportln(REPORT_L3,buffer);
         exitcode = 1;
     }
     return exitcode;
@@ -943,7 +943,7 @@ int TelstraIoT::registerDevice(const char* name, char* buffer, int bufferSize, c
 
 
 int TelstraIoT::isDeviceRegistered(const char* id, const char* type, const char* name) {
-    reportln(REPORT_L2,"[LOG] isDeviceRegistered():Sending GET request");
+    reportln(REPORT_L3,"[LOG] isDeviceRegistered():Sending GET request");
     HttpRequest* request = new HttpRequest(conn);
 
     // custom path writing
@@ -966,16 +966,16 @@ int TelstraIoT::isDeviceRegistered(const char* id, const char* type, const char*
  	delete response;
    if (exitcode == 200) {
         if (strcmp(registeredName, name) == 0) {
-            reportln(REPORT_L2,"[LOG] isDeviceRegistered():Device is registered");
+            reportln(REPORT_L3,"[LOG] isDeviceRegistered():Device is registered");
             exitcode = 1;
         } else {
-            reportln(REPORT_L2,"[LOG] isDeviceRegistered():Device is not registered");
+            reportln(REPORT_L3,"[LOG] isDeviceRegistered():Device is not registered");
             exitcode = -1;
         }
     } else if (exitcode == 0) {
         exitcode = -2;
     } else if (exitcode == 404) {
-        reportln(REPORT_L2,"[WARNING] isDeviceRegistered():HTTP code 404");
+        reportln(REPORT_L3,"[WARNING] isDeviceRegistered():HTTP code 404");
         exitcode = -1;
     } else {
         exitcode *= -1;
@@ -985,22 +985,22 @@ int TelstraIoT::isDeviceRegistered(const char* id, const char* type, const char*
 
 
 int TelstraIoT::raiseAlarm(const char* type, const char* status, const char* severity, const char* text) {
-    reportln(REPORT_L2,"[LOG] Entering raiseAlarm()[1]");
+    reportln(REPORT_L3,"[LOG] Entering raiseAlarm()[1]");
 	char time[50];
 	IoTDevice->getTime(time);
     return raiseAlarm(type, status, severity, time, text);
 }
 
 int TelstraIoT::raiseAlarm(const char* type, const char* status, const char* severity, const char* time, const char* text) {
-    reportln(REPORT_L2,"[LOG] Entering raiseAlarm()[2] : Forming request");
+    reportln(REPORT_L3,"[LOG] Entering raiseAlarm()[2] : Forming request");
     HttpRequest* request = new HttpRequest(conn, host, "/alarm/alarms", 443, "POST");
     writeAuth(request);
     request->writeAlarmContentType();
-     reportln(REPORT_L2,"[LOG] Entering raiseAlarm()[2] : Auth written");
+     reportln(REPORT_L3,"[LOG] Entering raiseAlarm()[2] : Auth written");
 
     int contentLength = 76 + strlen(deviceId) + strlen(type) + strlen(status) + strlen(severity) + strlen(time) + strlen(text);
-     report(REPORT_L2,"[LOG] Entering raiseAlarm()[2] : Content length:");
-     reportln(REPORT_L2,contentLength);
+     report(REPORT_L3,"[LOG] Entering raiseAlarm()[2] : Content length:");
+     reportln(REPORT_L3,contentLength);
 
 
     request->startContent(contentLength);
@@ -1024,23 +1024,23 @@ int TelstraIoT::raiseAlarm(const char* type, const char* status, const char* sev
     int exitcode = response->getHttpCode();
 	delete response;
     if (exitcode == 0) {
-		reportln(REPORT_L2,"[WARNING] raiseAlarm()[2] : No response received!");
+		reportln(REPORT_L3,"[WARNING] raiseAlarm()[2] : No response received!");
         exitcode = -2;
     } else if(exitcode == 201) {
-		reportln(REPORT_L2,"[LOG] raiseAlarm()[2] : Received valid HTTP response!");
+		reportln(REPORT_L3,"[LOG] raiseAlarm()[2] : Received valid HTTP response!");
         exitcode = 1;
     } else if (exitcode > 0) {
- 		report(REPORT_L2,"[WARNING] raiseAlarm()[2] : Received invalid response code - HTTP ");
- 		reportln(REPORT_L2,exitcode);
+ 		report(REPORT_L3,"[WARNING] raiseAlarm()[2] : Received invalid response code - HTTP ");
+ 		reportln(REPORT_L3,exitcode);
        exitcode *= -1;
     }
     
-    reportln(REPORT_L2,"[LOG] Exiting raiseAlarm()");
+    reportln(REPORT_L3,"[LOG] Exiting raiseAlarm()");
     return exitcode;
 }
 
 int TelstraIoT::sendMeasurement(const char* type, const char* fragmentName, const char* measurementName, const long &mValue, const char* mUnit) {
-	reportln(REPORT_L2,"[LOG] Entering sendMeasurement()[1]");
+	reportln(REPORT_L3,"[LOG] Entering sendMeasurement()[1]");
     char time[50];
 	char measurementString[12];
 	sprintf(measurementString,"%ld",mValue);
@@ -1049,32 +1049,32 @@ int TelstraIoT::sendMeasurement(const char* type, const char* fragmentName, cons
         return sendMeasurement(type, time, fragmentName, measurementName, measurementString, mUnit);
     }
     else{
-        reportln(REPORT_L2,"[WARNING] sendMeasurement()[1]: Invalid time");
-        reportln(REPORT_L2,"[LOG] sendMeasurement()[1]: Updating RTC clock time");
+        reportln(REPORT_L3,"[WARNING] sendMeasurement()[1]: Invalid time");
+        reportln(REPORT_L3,"[LOG] sendMeasurement()[1]: Updating RTC clock time");
         resp=IoTDevice->updateRTCFromNetwork(time);
         if(resp==TELSTRAIOT_STATUS_OK){
-            reportln(REPORT_L2,"[LOG] sendMeasurement()[1]: Getting time again");
+            reportln(REPORT_L3,"[LOG] sendMeasurement()[1]: Getting time again");
             resp = IoTDevice->getTime(time);
             if(resp==TELSTRAIOT_STATUS_OK){
                 return sendMeasurement(type, time, fragmentName, measurementName, measurementString, mUnit);
             }
             else{
-                reportln(REPORT_L2,"[ERROR] sendMeasurement()[1]: Updating time failed, dropping POST measurement");
+                reportln(REPORT_L3,"[ERROR] sendMeasurement()[1]: Updating time failed, dropping POST measurement");
                 if(this->restablishCellularSystem()==0){
-                    reportln(REPORT_L2,"[LOG] sendMeasurement()[1] : Connection Restablished");
+                    reportln(REPORT_L3,"[LOG] sendMeasurement()[1] : Connection Restablished");
                 }
                 else{
-                    reportln(REPORT_L2,"[ERROR] sendMeasurement()[1] : Connection Recovery failed");
+                    reportln(REPORT_L3,"[ERROR] sendMeasurement()[1] : Connection Recovery failed");
                 }
                 return -2;
             }
         }else{
-            reportln(REPORT_L2,"[ERROR] sendMeasurement()[1]: Updating RTC failed, dropping POST measurement");
+            reportln(REPORT_L3,"[ERROR] sendMeasurement()[1]: Updating RTC failed, dropping POST measurement");
             if(this->restablishCellularSystem()==0){
-                reportln(REPORT_L2,"[LOG] sendMeasurement()[1] : Connection Restablished");
+                reportln(REPORT_L3,"[LOG] sendMeasurement()[1] : Connection Restablished");
             }
             else{
-                reportln(REPORT_L2,"[ERROR] sendMeasurement()[1] : Connection Recovery failed");
+                reportln(REPORT_L3,"[ERROR] sendMeasurement()[1] : Connection Recovery failed");
             }
             return -2;
         }
@@ -1084,7 +1084,7 @@ int TelstraIoT::sendMeasurement(const char* type, const char* fragmentName, cons
 }
 
 HttpRequest* TelstraIoT::startMeasurementRequest(const char* type, const char* time, const char* measurementName, const char* mUnit) {
-	reportln(REPORT_L2,"[LOG] startMeasurementRequest() : Creating HTTP request");
+	reportln(REPORT_L3,"[LOG] startMeasurementRequest() : Creating HTTP request");
     HttpRequest* request = new HttpRequest(conn, host, "/measurement/measurements", 443, "POST");
 
     writeAuth(request);
@@ -1094,14 +1094,14 @@ HttpRequest* TelstraIoT::startMeasurementRequest(const char* type, const char* t
 }
 
 int TelstraIoT::sendMeasurement(const char* type, const char* time, const char* fragmentName, const char* measurementName, const long &mValue, const char* mUnit) {
-	reportln(REPORT_L2,"[LOG] Entering sendMeasurement()[2]");
+	reportln(REPORT_L3,"[LOG] Entering sendMeasurement()[2]");
     char measurementString[12];
 	sprintf(measurementString,"%ld",mValue);
     return sendMeasurement(type, time, fragmentName, measurementName, measurementString, mUnit);
 }
 
 int TelstraIoT::sendMeasurement(const char* type, const char* fragmentName, const char* measurementName, char* measurementString, const char* mUnit) {
-	reportln(REPORT_L2,"[LOG] Entering sendMeasurement()[3]");
+	reportln(REPORT_L3,"[LOG] Entering sendMeasurement()[3]");
     char time[50];
 	int resp = IoTDevice->getTime(time);
     if(resp==TELSTRAIOT_STATUS_OK){
@@ -1142,7 +1142,7 @@ int TelstraIoT::sendMeasurement(const char* type, const char* fragmentName, cons
 }
 
 int TelstraIoT::sendMeasurement(const char* type, const char* time, const char* fragmentName, const char* measurementName, char* measurementString, const char* mUnit) {
- 	reportln(REPORT_L2,"[LOG] Entering sendMeasurement()[4]");
+ 	reportln(REPORT_L3,"[LOG] Entering sendMeasurement()[4]");
     HttpRequest* request = startMeasurementRequest(type, time, measurementName, mUnit);
 
 	int contentLength = 69 + strlen(deviceId) + strlen(time) + strlen(type) + strlen(fragmentName) + strlen(measurementName) + strlen(measurementString) + strlen(mUnit);
@@ -1181,27 +1181,27 @@ int TelstraIoT::sendMeasurement(const char* type, const char* time, const char* 
     switch(exitcode){
 
         case 201:{
-            reportln(REPORT_L2,"[LOG] sendMeasurement()[4] : Received valid HTTP response!");
+            reportln(REPORT_L3,"[LOG] sendMeasurement()[4] : Received valid HTTP response!");
             exitcode = 1; 
             break;
         }
         case 0:
-            reportln(REPORT_L2,"[WARNING] sendMeasurement()[4] : No response received!");
+            reportln(REPORT_L3,"[WARNING] sendMeasurement()[4] : No response received!");
         default:{
             if (exitcode != 0) {
- 		        report(REPORT_L2,"[LOG] sendMeasurement()[4] : Received invalid response code - HTTP ");
- 		        reportln(REPORT_L2,exitcode);
+ 		        report(REPORT_L3,"[LOG] sendMeasurement()[4] : Received invalid response code - HTTP ");
+ 		        reportln(REPORT_L3,exitcode);
              }
-            if(this->restablishCellularSystem()==0){
-                reportln(REPORT_L2,"[LOG] sendMeasurement()[4] : Connection Restablished");
+            if(this->restablishCellularSystem()==TELSTRAIOT_STATUS_OK){
+                reportln(REPORT_L3,"[LOG] sendMeasurement()[4] : Connection Restablished");
             }
             else{
-                reportln(REPORT_L2,"[ERROR] sendMeasurement()[4] : Connection Recovery failed");
+                reportln(REPORT_L3,"[ERROR] sendMeasurement()[4] : Connection Recovery failed");
             }
             exitcode = -2;
         }
     }
-	reportln(REPORT_L2,"[LOG] Exiting sendMeasurement()[4]");
+	reportln(REPORT_L3,"[LOG] Exiting sendMeasurement()[4]");
     return exitcode;
 }
 
@@ -1247,23 +1247,30 @@ void TelstraIoT::setHost(const char* _host, const int _port) {
 int TelstraIoT::restablishCellularSystem(){
     reportln(REPORT_L2,"[LOG] restablishCellularSystem() : Resetting G55 ");
     digitalWrite(G55_RESET, LOW); 
-	delay(1);
+	delay(10);
 	digitalWrite(G55_RESET, HIGH); 
 	delay(1000);
-    unsigned long startTime=millis();
-    unsigned long waitTime=15000; //15seconds
+    int attempts = 0;
+    int timeout=10000;
     reportln(REPORT_L2,"[LOG] restablishCellularSystem() : waiting for IoTDevice ...");
     while( !( IoTDevice->isPDPContextActive() ) ){
         delay(500);
-        if(millis()-startTime>waitTime){
-            reportln(REPORT_L2,"[WARNING] Exiting restablishCellularSystem() : Timeout - IoTDevice didn't respond ");
-            return -1;
-        }
+		attempts++;
+
+		if (attempts > (timeout*2)) {
+			reportln(REPORT_L2, "<M1Device:waitUntilCellularSystemIsReady> - Response Timeout");
+			return 	TELSTRAIOT_STATUS_TIMEOUT;
+		} 
     }
     reportln(REPORT_L2,"[LOG] restablishCellularSystem() : Reopening TCP connection");
-    conn->openTCP(host,443);
-    reportln(REPORT_L2,"[LOG] Exiting restablishCellularSystem() : TCP connection reopened");
-    return 0;
+    if (conn->openTCP(host,443)==CONNECTION4G_STATUS_OK){
+        reportln(REPORT_L2,"[LOG] Exiting restablishCellularSystem() : TCP connection reopened");
+        return TELSTRAIOT_STATUS_OK;
+    } else{
+        reportln(REPORT_L2,"[WARNING] Exiting restablishCellularSystem() : TCP connection Failed");
+        return -TELSTRAIOT_STATUS_ERROR;
+    }
+
 }
 
 /* ############################## BASE64 ############################## */
