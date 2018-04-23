@@ -35,6 +35,7 @@ private:
 	String endPoint;
 	String contentInfo;
 	time_t ttl;
+	void setBoardCurrentTime(TelstraM1Device* IoTDevice);
 };
 
 #endif /*AZURE_IOT_H*/
