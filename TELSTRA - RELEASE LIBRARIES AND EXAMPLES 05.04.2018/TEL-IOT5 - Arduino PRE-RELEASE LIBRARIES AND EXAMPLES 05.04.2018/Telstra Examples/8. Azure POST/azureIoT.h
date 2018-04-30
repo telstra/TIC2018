@@ -18,13 +18,12 @@ public:
 	void init(TelstraM1Device* IoTDevice);
 
 protected:
-    String urlEncode(const char* msg);
+    	String urlEncode(const char* msg);
 	const char* getStringValue(String value);
 
 private:
+	void setBoardCurrentTime(TelstraM1Device* IoTDevice);
 	String generateSas(char* key, String endPointUri);
-	void currentTime(char* timeBuffer);
-	int getNumber(char *input, int len);
 
 	time_t  sasExpiryTime = 0;
 	char* sasToken = new char[0];
