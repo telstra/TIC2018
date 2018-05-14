@@ -16,7 +16,7 @@ bool connected;
 char TOPIC[128];
 char CONTENT[255];
 char MainBuffer[1024];
-#define HOST "mqtt.iotpop.net"
+#define HOST "[IoT Hub CNAME].azure-devices.net"
 //#define HOST "test.mosquitto.org"
 #define PORT 8883
 
@@ -24,27 +24,27 @@ void stream_fake_data();
 
 void initialize_my_mqtt() {
 //  ClientInfo.client_id = "random-client-cachilupi";
-  ClientInfo.client_id = "XXXXXXXXXX";
+  ClientInfo.client_id = "[deviceID]";
   ClientInfo.keep_alive_sec = 60;
   ClientInfo.clean_session = true;
   ClientInfo.tls = true;
   ClientInfo.username_flag = true;
   ClientInfo.password_flag = true;
   ClientInfo.will_flag = false;
-  ClientInfo.username = "YYYYYYYYY";
-  ClientInfo.password = "ZZZZZZZZZ";
+  ClientInfo.username = "[IoT Hub CNAME].azure-devices.net/[deviceID]/api-version=2016-11-14";
+  ClientInfo.password = "SharedAccessSignature sr=xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
-  LastWillMessage.topic = "LastWillTopc";
+  LastWillMessage.topic = "devices/[deviceID]/messages/events/LastWillTopc";
   LastWillMessage.content = "LastWillContent";
   LastWillMessage.qos = 0;
   LastWillMessage.retain = false;
 
-  PublishMessage.topic = "users/XYXY/YZYZY";
+  PublishMessage.topic = "devices/[deviceID]/messages/events/";
   PublishMessage.content = "{ \"hello\": \"world\"}";
   PublishMessage.qos = 0;
   PublishMessage.retain = false;
 
-  SubscribeList[0].topic = "users/XYXY/YZYZY";
+  SubscribeList[0].topic = "devices/[deviceID]/messages/devicebound/#";
   SubscribeList[0].qos = 1;
 }
 
@@ -57,6 +57,7 @@ void setup() {
   commsif.begin(); // Must include for proper SPI communication
 	Serial.begin(115200);
 
+  Serial.println("Initialising MQTT");	
   initialize_my_mqtt();
   connected = false;
    
@@ -239,7 +240,7 @@ void stream_fake_data(){
     publishmessage+=motion;
     publishmessage+= "\"}\n";
 
-    //Serial.println(publishmessage);
+    Serial.println(publishmessage);
     //Serial.println(publishmessage.length());
     publishmessage.toCharArray(pubmessage_c,publishmessage.length()) ;
     PublishMessage.content = pubmessage_c;
