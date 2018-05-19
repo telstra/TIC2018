@@ -11,3 +11,5 @@ Head on over to the wiki (https://github.com/telstra/TIC2018/wiki) to get starte
 
 # Connecting to Azure IoT Hub
 Please refer to [this](/MQTT2AzureIoTHub.md) to learn how to use the Cat-M1 Development Board to connect directly to Azure IoT Hub using MQTT protocol and send messages. 
+
+For a guide to building an end to end demo app, have a look at https://github.com/mjksinc/IoTHubDemo (written by Matt Sinclair from Microsoft)
